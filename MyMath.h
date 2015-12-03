@@ -12,7 +12,7 @@
 
 
 extern "C" {
-  struct PNGFile *initImage(char* filename, int width, int height, char* title);
+  struct PNGFile *initImage(struct PNGFile *file, char* filename, int width, int height, char* title);
   void writeToImage(struct PNGFile *file, uint32_t *buffer);
   void finalise(struct PNGFile *file);
 }

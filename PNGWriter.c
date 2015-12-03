@@ -8,7 +8,6 @@
 
 void setRGB(png_byte *ptr, uint32_t val)
 {
-  printf("ptr '%p'\n", ptr);
   ptr[0] = (val >> 16) & 0xFF;
   ptr[1] = (val >> 8) & 0xFF;
   ptr[2] = val & 0xFF;
@@ -29,19 +28,16 @@ void writeToImage(struct PNGFile *file, uint32_t *buffer){
   // Write image data
 	int x;
   for (x=0; x<file->width; x++) {
-    printf("%d = %d\n", x, file->width);
-    setRGB(&(file->row[x*2]), buffer[x]);
+    setRGB(&(file->row[x*3]), buffer[x]);
   }
   png_write_row(file->png_ptr, file->row);
 }
 
-struct PNGFile *initImage(char* filename, int width, int height, char* title)
+struct PNGFile *initImage(struct PNGFile *file, char* filename, int width, int height, char* title)
 {
-  struct PNGFile *file = (struct PNGFile *)malloc(sizeof(struct PNGFile));
 	file->fp = NULL;
 	file->png_ptr = NULL;
 	file->info_ptr = NULL;
-	file->row = NULL;
   file->width = width;
 	
 	// Open file for writing (binary mode)
@@ -89,10 +85,6 @@ struct PNGFile *initImage(char* filename, int width, int height, char* title)
 
 	png_write_info(file->png_ptr, file->info_ptr);
 
-	// Allocate memory for one row (3 bytes per pixel - RGB)
-	file->row = (png_byte *) malloc(3 * width * sizeof(png_byte));
-  file->row[0] = 1;
-  printf("%p, %p\n", file, file->row);
   return file;
 }
 

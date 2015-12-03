@@ -13,22 +13,24 @@ void threadMethod(MyMath *context, int i_start, int i_end, int j, uint32_t *imag
 int diverges(CNumber a, int wdh);
 
 MyMath::MyMath(int width, int height): width_(width), height_(height){
-  image_ = new uint32_t[height_];
+  image_ = new uint32_t[width_];
   colors_ = new uint32_t[30];
   fillColors();
 }
 
 MyMath::~MyMath(){
   delete[] image_;
+  delete[] colors_;
 }
 
 void MyMath::calculate(char *filename){
   double stepX = ((double)std::abs(MyMath::START_X - MyMath::END_X)) / (double)width_;
   double stepY = ((double)std::abs(MyMath::START_Y - MyMath::END_Y)) / (double)height_;
-  void *file = initImage(filename, width_, height_, filename);
-  png_byte *row = ((struct PNGFile *)file)->row;
-  printf("before calc: %p\n", file);
-  getchar();
+  struct PNGFile *file = new struct PNGFile;
+  
+	// Allocate memory for one row (3 bytes per pixel - RGB)
+  file->row = new unsigned char[3*width_];
+  initImage(file, filename, width_, height_, filename);
   for(int i = 0; i < height_; i++){
     std::thread p1 (&threadMethod, this, 0,           width_/4,   i,  image_, stepX, stepY, colors_);
     std::thread p2 (&threadMethod, this, width_/4,    width_/2,   i,  image_, stepX, stepY, colors_);
@@ -38,10 +40,8 @@ void MyMath::calculate(char *filename){
     p2.join();
     p3.join();
     p4.join();
-    ((struct PNGFile *)file)->row = row;
-    printf("in calc: %p = %p\n", file, row);
-    getchar();
     writeToImage((struct PNGFile *)file, image_);
+    printf("%f%%\n", ((float)i)/((float)height_));
   }
   finalise(((struct PNGFile *)file));
 }
