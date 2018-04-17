@@ -41,7 +41,7 @@ void MyMath::calculate(char *filename){
     p3.join();
     p4.join();
     writeToImage((struct PNGFile *)file, image_);
-    printf("%f%%\n", ((float)i)/((float)height_));
+    //printf("%f%%\n", ((float)i)/((float)height_));
   }
   finalise(((struct PNGFile *)file));
 }
@@ -81,7 +81,7 @@ double MyMath::getStartY(){
 
 uint32_t MyMath::getColor(double re, double im){
   CNumber c(re, im);
-  int i = 0;//diverges(c);
+  int i = diverges(c, 1000);
   if(i == 0){
     return colors_[0];
   }else{
